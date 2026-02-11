@@ -1,0 +1,137 @@
+{
+    "documents": [
+        {
+            "docId": "wc-cutting",
+            "docType": "workCenter",
+            "data": {
+                "name": "Cutting Station",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 3,
+                        "startHour": 8,
+                        "endHour": 17
+                    }
+                ],
+                "maintenanceWindows": []
+            }
+        },
+        {
+            "docId": "wc-welding",
+            "docType": "workCenter",
+            "data": {
+                "name": "Welding Station",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 3,
+                        "startHour": 8,
+                        "endHour": 17
+                    }
+                ],
+                "maintenanceWindows": [
+                    {
+                        "startDate": "2025-02-10T13:00:00Z",
+                        "endDate": "2025-02-10T15:00:00Z",
+                        "reason": "Scheduled equipment calibration"
+                    }
+                ]
+            }
+        },
+        {
+            "docId": "wc-painting",
+            "docType": "workCenter",
+            "data": {
+                "name": "Painting Station",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 3,
+                        "startHour": 8,
+                        "endHour": 17
+                    }
+                ],
+                "maintenanceWindows": []
+            }
+        },
+        {
+            "docId": "mo-product-a",
+            "docType": "manufacturingOrder",
+            "data": {
+                "manufacturingOrderNumber": "MO-001",
+                "itemId": "PRODUCT-A",
+                "quantity": 100,
+                "dueDate": "2025-02-11T17:00:00Z"
+            }
+        },
+        {
+            "docId": "wo-cut",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-CUT-001",
+                "manufacturingOrderId": "MO-001",
+                "workCenterId": "Cutting Station",
+                "startDate": "2025-02-10T08:00:00Z",
+                "endDate": "2025-02-10T10:00:00Z",
+                "durationMinutes": 120,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": []
+            }
+        },
+        {
+            "docId": "wo-weld",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-WELD-001",
+                "manufacturingOrderId": "MO-001",
+                "workCenterId": "Welding Station",
+                "startDate": "2025-02-10T10:00:00Z",
+                "endDate": "2025-02-10T14:00:00Z",
+                "durationMinutes": 240,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-CUT-001"]
+            }
+        },
+        {
+            "docId": "wo-paint",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-PAINT-001",
+                "manufacturingOrderId": "MO-001",
+                "workCenterId": "Painting Station",
+                "startDate": "2025-02-10T14:00:00Z",
+                "endDate": "2025-02-10T16:00:00Z",
+                "durationMinutes": 120,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-WELD-001"]
+            }
+        }
+    ]
+}

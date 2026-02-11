@@ -1,0 +1,158 @@
+{
+    "documents": [
+        {
+            "docId": "wc-cnc-machine",
+            "docType": "workCenter",
+            "data": {
+                "name": "CNC Machine",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 8,
+                        "endHour": 17
+                    }
+                ],
+                "maintenanceWindows": []
+            }
+        },
+        {
+            "docId": "wc-inspection",
+            "docType": "workCenter",
+            "data": {
+                "name": "Inspection Station",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 8,
+                        "endHour": 17
+                    }
+                ],
+                "maintenanceWindows": []
+            }
+        },
+        {
+            "docId": "mo-part-x",
+            "docType": "manufacturingOrder",
+            "data": {
+                "manufacturingOrderNumber": "MO-PART-X",
+                "itemId": "PART-X",
+                "quantity": 50,
+                "dueDate": "2025-02-10T17:00:00Z"
+            }
+        },
+        {
+            "docId": "mo-part-y",
+            "docType": "manufacturingOrder",
+            "data": {
+                "manufacturingOrderNumber": "MO-PART-Y",
+                "itemId": "PART-Y",
+                "quantity": 30,
+                "dueDate": "2025-02-10T17:00:00Z"
+            }
+        },
+        {
+            "docId": "mo-part-z",
+            "docType": "manufacturingOrder",
+            "data": {
+                "manufacturingOrderNumber": "MO-PART-Z",
+                "itemId": "PART-Z",
+                "quantity": 40,
+                "dueDate": "2025-02-10T17:00:00Z"
+            }
+        },
+        {
+            "docId": "wo-machine-x",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-MACHINE-X",
+                "manufacturingOrderId": "MO-PART-X",
+                "workCenterId": "CNC Machine",
+                "startDate": "2025-02-10T08:00:00Z",
+                "endDate": "2025-02-10T10:00:00Z",
+                "durationMinutes": 120,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": []
+            }
+        },
+        {
+            "docId": "wo-machine-y",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-MACHINE-Y",
+                "manufacturingOrderId": "MO-PART-Y",
+                "workCenterId": "CNC Machine",
+                "startDate": "2025-02-10T08:30:00Z",
+                "endDate": "2025-02-10T11:30:00Z",
+                "durationMinutes": 180,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": []
+            }
+        },
+        {
+            "docId": "wo-machine-z",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-MACHINE-Z",
+                "manufacturingOrderId": "MO-PART-Z",
+                "workCenterId": "CNC Machine",
+                "startDate": "2025-02-10T09:00:00Z",
+                "endDate": "2025-02-10T10:30:00Z",
+                "durationMinutes": 90,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": []
+            }
+        },
+        {
+            "docId": "wo-inspect-x",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-INSPECT-X",
+                "manufacturingOrderId": "MO-PART-X",
+                "workCenterId": "Inspection Station",
+                "startDate": "2025-02-10T10:00:00Z",
+                "endDate": "2025-02-10T10:30:00Z",
+                "durationMinutes": 30,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-MACHINE-X"]
+            }
+        },
+        {
+            "docId": "wo-inspect-y",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-INSPECT-Y",
+                "manufacturingOrderId": "MO-PART-Y",
+                "workCenterId": "Inspection Station",
+                "startDate": "2025-02-10T11:30:00Z",
+                "endDate": "2025-02-10T12:00:00Z",
+                "durationMinutes": 30,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-MACHINE-Y"]
+            }
+        },
+        {
+            "docId": "wo-inspect-z",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-INSPECT-Z",
+                "manufacturingOrderId": "MO-PART-Z",
+                "workCenterId": "Inspection Station",
+                "startDate": "2025-02-10T10:30:00Z",
+                "endDate": "2025-02-10T11:00:00Z",
+                "durationMinutes": 30,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-MACHINE-Z"]
+            }
+        }
+    ]
+}
