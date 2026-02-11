@@ -22,9 +22,9 @@
                 "workOrderNumber": "WO-001",
                 "manufacturingOrderId": "MO-1",
                 "workCenterId": "Assembly A",
-                "startDate": "2025-02-10T08:00:00Z",
-                "endDate": "2025-02-10T12:00:00Z",
-                "durationMinutes": 240,
+                "startDate": "2025-02-10T13:00:00Z",
+                "endDate": "2025-02-10T14:00:00Z",
+                "durationMinutes": 60,
                 "isMaintenance": false,
                 "dependsOnWorkOrderIds": []
             }
