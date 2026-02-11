@@ -1,4 +1,4 @@
-import { DateTime } from "luxon";
+import { DateTime, Interval } from "luxon";
 import { ReflowService } from "./reflow.service";
 import { workCenter } from "./fixtures";
 
@@ -256,6 +256,89 @@ describe(ReflowService.name, () => {
             const expected = DateTime.fromObject({ year: 2026, month: 1, day: 12, hour: 8, minute: 0, second: 0, millisecond: 0 });
             const result = ReflowService.nextAvailableMoment(wc, input);
             expect(result.toISO()).toBe(expected.toISO());
+        });
+    });
+
+    describe("sortBookedSlots", () => {
+        it("should sort the booked slots by start time", () => {
+            const bookedSlots = [
+                Interval.fromDateTimes(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0, millisecond: 0 }), DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 12, minute: 0, second: 0, millisecond: 0 })),
+                Interval.fromDateTimes(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 11, minute: 0, second: 0, millisecond: 0 }), DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 13, minute: 0, second: 0, millisecond: 0 })),
+            ];
+            expect(ReflowService.sortBookedSlots(bookedSlots)).toEqual(bookedSlots.sort((a, b) => a.start!.diff(b.start!).toMillis()));
+        });
+
+        it("should sort the booked slots by end time", () => {
+            const bookedSlots = [
+                Interval.fromDateTimes(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0, millisecond: 0 }), DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 12, minute: 0, second: 0, millisecond: 0 })),
+                Interval.fromDateTimes(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 11, minute: 0, second: 0, millisecond: 0 }), DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 13, minute: 0, second: 0, millisecond: 0 })),
+            ];
+            expect(ReflowService.sortBookedSlots(bookedSlots)).toEqual(bookedSlots.sort((a, b) => a.end!.diff(b.end!).toMillis()));
+        });
+    });
+
+    describe("firstFreeSlot", () => {
+        it("should find the slot after all existing bookings", () => {
+            // Work center has a shift on Monday, 8:00-17:00
+            const wc = workCenter("WC-001", [{ dayOfWeek: 1, startHour: 8, endHour: 17 }], []);
+            const start = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 8, minute: 0, second: 0, millisecond: 0 });
+            // Booked: 8:00-10:00, 10:00-11:00 (so, free from 11:00)
+            const bookedSlots = [
+                Interval.fromDateTimes(start, start.plus({ hours: 2 })),
+                Interval.fromDateTimes(start.plus({ hours: 2 }), start.plus({ hours: 3 })),
+            ];
+            const duration = 60; // 60 mins
+            const result = ReflowService.firstFreeSlot(wc, bookedSlots, start, duration);
+            expect(result.start!.toISO()).toBe(start.plus({ hours: 3 }).toISO());
+            expect(result.end!.toISO()).toBe(start.plus({ hours: 4 }).toISO());
+        });
+
+        it("should find slot between two bookings", () => {
+            const wc = workCenter("WC-001", [{ dayOfWeek: 2, startHour: 8, endHour: 17 }], []);
+            const day = DateTime.fromObject({ year: 2026, month: 1, day: 6, hour: 8, minute: 0, second: 0, millisecond: 0 });
+            // Slot: 8:00–10:00, 12:00–14:00; search for 2 hour slot, earliest 10:00
+            const bookedSlots = [
+                Interval.fromDateTimes(day, day.plus({ hours: 2 })),
+                Interval.fromDateTimes(day.plus({ hours: 4 }), day.plus({ hours: 6 })),
+            ];
+            const duration = 120;
+            const earliest = day.plus({ hours: 2 });
+            const result = ReflowService.firstFreeSlot(wc, bookedSlots, earliest, duration);
+            expect(result.start!.toISO()).toBe(day.plus({ hours: 2 }).toISO());
+            expect(result.end!.toISO()).toBe(day.plus({ hours: 4 }).toISO());
+        });
+
+        it("should skip to the next week if no slot is available today", () => {
+            // Monday: 8:00–9:00, 9:00–17:00 booked (full day booked)
+            const wc = workCenter("WC-001", [{ dayOfWeek: 1, startHour: 8, endHour: 17 }], []);
+            const day = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 8, minute: 0 });
+            const bookedSlots = [
+                Interval.fromDateTimes(day, day.plus({ hours: 1 })),
+                Interval.fromDateTimes(day.plus({ hours: 1 }), day.plus({ hours: 9 })),
+            ];
+            const duration = 60;
+            // Next Monday at 8:00 should be available
+            const expectedStart = day.plus({ days: 7 }); // next Monday, 8:00
+            const result = ReflowService.firstFreeSlot(wc, bookedSlots, day, duration);
+            expect(result.start!.toISO()).toBe(expectedStart.toISO());
+            expect(result.end!.toISO()).toBe(expectedStart.plus({ minutes: 60 }).toISO());
+        });
+
+        it("should ignore maintenance windows when computing slots (because they are not in slots but checked via availability)", () => {
+            // Shift is Monday 8:00–17:00, but maintenance from 9:00–10:00
+            const wc = workCenter(
+                "WC-001",
+                [{ dayOfWeek: 1, startHour: 8, endHour: 17 }],
+                [{ startDate: DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 9, minute: 0, second: 0, millisecond: 0 }).toISO() || "", endDate: DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0, millisecond: 0 }).toISO() || "" }]
+            );
+            const day = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 8, minute: 0});
+            const bookedSlots: Interval[] = [];
+            // Try to book 120 minutes from 8:00 (should skip 9-10 maintenance)
+            const result = ReflowService.firstFreeSlot(wc, bookedSlots, day, 120);
+            // It will start at 8:00, occupy 8:00-9:00, then 'pause' 9:00-10:00, resume 10:00-11:00
+            // so the end should be at 11:00
+            expect(result.start!.toISO()).toBe(day.toISO());
+            expect(result.end!.toISO()).toBe(day.plus({ hours: 3 }).toISO());
         });
     });
 });
