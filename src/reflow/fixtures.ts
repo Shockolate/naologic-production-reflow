@@ -1,4 +1,4 @@
-import { WorkCenterData, WorkCenterMaintenanceWindow, WorkCenterShift, WorkOrderData } from "./types";
+import { ManufacturingOrderData, ManufacturingOrderDocument, WorkCenterData, WorkCenterDocument, WorkCenterMaintenanceWindow, WorkCenterShift, WorkOrderData, WorkOrderDocument } from "./types";
 
 /**
  * Creates a valid ERP-style WorkOrderData object (per BE-technical-test.md).
@@ -23,6 +23,17 @@ export function workOrder(
     };
 }
 
+export function workOrderDocument(
+    workOrderNumber: string,
+    dependsOnWorkOrderIds: string[] = [],
+    overrides: Partial<WorkOrderData> = {}): WorkOrderDocument {
+    return {
+        docId: `WOD-${workOrderNumber}`,
+        docType: "workOrder",
+        data: workOrder(workOrderNumber, dependsOnWorkOrderIds, overrides),
+    };
+}
+
 export function workCenter(
     name: string,
     shifts: WorkCenterShift[] = [],
@@ -34,5 +45,40 @@ export function workCenter(
         shifts,
         maintenanceWindows,
         ...overrides,
+    };
+}
+
+export function workCenterDocument(
+    name: string,
+    shifts: WorkCenterShift[] = [],
+    maintenanceWindows: WorkCenterMaintenanceWindow[] = [],
+    overrides: Partial<WorkCenterData> = {}): WorkCenterDocument {
+    return {
+        docId: `WCD-${name}`,
+        docType: "workCenter",
+        data: workCenter(name, shifts, maintenanceWindows, overrides),
+    };
+}
+
+export function manufacturingOrder(
+    manufacturingOrderNumber: string,
+    overrides: Partial<ManufacturingOrderData> = {}
+): ManufacturingOrderData {
+    return {
+        manufacturingOrderNumber,
+        itemId: "ITEM-001",
+        quantity: 1,
+        dueDate: "2025-01-06T10:00:00.000Z",
+        ...overrides,
+    };
+}
+
+export function manufacturingOrderDocument(
+    manufacturingOrderNumber: string,
+    overrides: Partial<ManufacturingOrderData> = {}): ManufacturingOrderDocument {
+    return {
+        docId: `MOD-${manufacturingOrderNumber}`,
+        docType: "manufacturingOrder",
+        data: manufacturingOrder(manufacturingOrderNumber, overrides),
     };
 }

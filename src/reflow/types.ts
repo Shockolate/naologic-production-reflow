@@ -1,4 +1,4 @@
-export type DocumentType = "workOrder" | "workCenter" | "manufacturingOrder";
+export type ReflowDocumentType = "workOrder" | "workCenter" | "manufacturingOrder";
 
 export type WorkOrderData = {
     workOrderNumber: string;
@@ -69,7 +69,7 @@ export type ManufacturingOrderData = {
 
 export type ReflowDocument = {
     docId: string;
-    docType: DocumentType;
+    docType: ReflowDocumentType;
     data: WorkOrderData | WorkCenterData | ManufacturingOrderData;
 }
 
@@ -104,8 +104,15 @@ export function isManufacturingOrderDocument(document: unknown): document is Man
     return isReflowDocument(document) && document.docType === "manufacturingOrder";
 }
 
+
+export type ReflowServiceInput = {
+    workOrders: WorkOrderDocument[];
+    workCenters: WorkCenterDocument[];
+    manufacturingOrders: ManufacturingOrderDocument[];
+}
+
 export type ReflowResult = {
-    updatedWorkOrders: WorkOrderDocument[];
+    updatedWorkOrders: WorkOrderData[];
     changes: string[];
     explanation: string[];
 }

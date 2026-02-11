@@ -1,22 +1,86 @@
 import { Injectable } from "@nestjs/common";
-import { ReflowDocument, WorkOrderDocument, WorkCenterDocument, ManufacturingOrderDocument, ReflowResult, WorkCenterData } from "./types";
+import { ReflowResult, WorkCenterData, WorkOrderData, ReflowServiceInput, WorkOrderDocument, WorkCenterDocument } from "./types";
 import { WorkflowBuilderService } from "./workflow-builder.service";
-import { DateTime, Interval} from "luxon";
+import { DateTime, Interval } from "luxon";
 import { DateTimeUtil } from "./DateTimeUtil";
-
-type ReflowServiceInput = {
-    workOrders: WorkOrderDocument[];
-    workCenters: WorkCenterDocument[];
-    manufacturingOrders: ManufacturingOrderDocument[];
-}
 
 @Injectable()
 export class ReflowService {
-    constructor() {}
+    constructor(private readonly workflowBuilderService: WorkflowBuilderService) { }
 
     reflow(input: ReflowServiceInput): ReflowResult {
+        const assignments = new Map<string, { workCenterName: string, workOrder: WorkOrderData }>();
+
+        const workCenters = ReflowService.populateWorkCenters(input.workCenters);
+
+        const workflowGraph = this.workflowBuilderService.buildWorkflow(
+            input.workOrders
+                .map(wo => wo.data)
+                .sort((a, b) => 
+                    DateTime.fromISO(a.startDate).diff(DateTime.fromISO(b.startDate)).toMillis()
+            ));
+        const sortedWorkOrderNumbers = this.workflowBuilderService.getSortedWorkOrderNumbers(workflowGraph);
+        const bookedSlotsByCenter = new Map<string, Interval[]>();
+        const completionTimesOfCompletedWorkOrders = new Map<string, DateTime>();
+
+        // Process work orders in topological order
+        for (const workOrderNumber of sortedWorkOrderNumbers) {
+            const workOrder = workflowGraph.getNodeAttribute(workOrderNumber, 'workOrder');
+            if (workOrder.isMaintenance) {
+                // Keep the maintenance work order in the same position
+                completionTimesOfCompletedWorkOrders.set(workOrderNumber, DateTime.fromISO(workOrder.endDate));
+                assignments.set(workOrderNumber, {
+                    workCenterName: workOrder.workCenterId,
+                    workOrder: {
+                        ...workOrder,
+                        startDate: workOrder.startDate,
+                        endDate: workOrder.endDate,
+                    }
+                });
+                continue;
+            }
+
+            const workCenter = workCenters.get(workOrder.workCenterId);
+            if (!workCenter) {
+                throw new Error(`Work center ${workOrder.workCenterId} not found`);
+            }
+            const duration = workOrder.durationMinutes;
+
+            let earliestStart = DateTime.fromISO(workOrder.startDate);
+
+            // Calculate earliest start from dependencies
+            for (const parentId of workOrder.dependsOnWorkOrderIds) {
+                if (parentId in completionTimesOfCompletedWorkOrders) {
+                    earliestStart = DateTime.max(earliestStart, completionTimesOfCompletedWorkOrders.get(parentId)!);
+                }
+            }
+
+            // Clamp to start of next available window if earliestStart is not in shift
+            if (!ReflowService.IsAvailable(workCenter, earliestStart)) {
+                earliestStart = ReflowService.nextAvailableMoment(workCenter, earliestStart);
+            }
+
+            // get the booked slot
+            const interval = ReflowService.firstFreeSlot(workCenter, bookedSlotsByCenter.get(workCenter.name) || [], earliestStart, duration);
+
+            // record the booked slot
+            assignments.set(workOrderNumber, {
+                workCenterName: workCenter.name, workOrder: {
+                    ...workOrder,
+                    startDate: interval.start!.toISO(),
+                    endDate: interval.end!.toISO(),
+                }
+            });
+            completionTimesOfCompletedWorkOrders.set(workOrderNumber, interval.end!);
+
+            // Insert the booked slot into the booked slots map.
+            bookedSlotsByCenter.set(workCenter.name, [...(bookedSlotsByCenter.get(workCenter.name) || []), interval]);
+        }
+
+        console.log(assignments);
+
         return {
-            updatedWorkOrders: [],
+            updatedWorkOrders: Array.from(assignments.values()).map(({ workOrder }) => workOrder),
             changes: [],
             explanation: [],
         }
@@ -84,7 +148,7 @@ export class ReflowService {
     static firstFreeSlot(workCenter: WorkCenterData, bookedSlots: Interval[], earliestAvailable: DateTime, durationMinutes: number): Interval {
         const sortedBookedSlots = ReflowService.sortBookedSlots(bookedSlots);
         let candidateStartTime = earliestAvailable;
-        
+
         // To avoid an infinite loop, limit to the number of possible slots to check (worst case: one per booked slot + 1)
         const maxAttempts = sortedBookedSlots.length + 1;
         let attempts = 0;
@@ -113,4 +177,19 @@ export class ReflowService {
         return bookedSlots.sort((a, b) => a.start!.diff(b.start!).toMillis());
     }
 
+    static populateWorkCenters(workCenters: WorkCenterDocument[]): Map<string, WorkCenterData> {
+        const workCenterMap = new Map<string, WorkCenterData>();
+        for (const workCenter of workCenters) {
+            workCenterMap.set(workCenter.data.name, workCenter.data);
+        }
+        return workCenterMap;
+    }
+
+    static populateWorkOrdersByCenter(workOrders: WorkOrderDocument[]): Map<string, WorkOrderData[]> {
+        const workOrdersByCenter = new Map<string, WorkOrderData[]>();
+        for (const workOrder of workOrders) {
+            workOrdersByCenter.set(workOrder.data.workCenterId, [...(workOrdersByCenter.get(workOrder.data.workCenterId) || []), workOrder.data]);
+        }
+        return workOrdersByCenter;
+    }
 }

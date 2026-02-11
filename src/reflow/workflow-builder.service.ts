@@ -29,5 +29,9 @@ export class WorkflowBuilderService {
         }
         return graph;
     }
+
+    getSortedWorkOrderNumbers(graph: DirectedGraph<{ workOrder: WorkOrderData }>): string[] {
+        return topologicalSort(graph);
+    }
     
 }
