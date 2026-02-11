@@ -1,17 +1,15 @@
 import { Type } from "class-transformer";
-import { IsIn, IsString, ValidateNested } from "class-validator";
+import { IsString, ValidateNested } from "class-validator";
 import { ManufacturingOrderDataDto } from "./manufacturing-order-data.dto";
 import { WorkCenterDataDto } from "./work-center-data.dto";
 import { WorkOrderDataDto } from "./work-order-data.dto";
-
-const REFLOW_DOC_TYPES = ["workOrder", "workCenter", "manufacturingOrder"] as const;
 
 export class WorkOrderDocumentDto {
     @IsString()
     docId!: string;
 
-    @IsIn(REFLOW_DOC_TYPES)
-    docType!: "workOrder";
+    @IsString()
+    docType: "workOrder" = "workOrder";
 
     @ValidateNested()
     @Type(() => WorkOrderDataDto)
@@ -22,8 +20,8 @@ export class WorkCenterDocumentDto {
     @IsString()
     docId!: string;
 
-    @IsIn(REFLOW_DOC_TYPES)
-    docType!: "workCenter";
+    @IsString()
+    docType: "workCenter" = "workCenter";
 
     @ValidateNested()
     @Type(() => WorkCenterDataDto)
@@ -34,8 +32,8 @@ export class ManufacturingOrderDocumentDto {
     @IsString()
     docId!: string;
 
-    @IsIn(REFLOW_DOC_TYPES)
-    docType!: "manufacturingOrder";
+    @IsString()
+    docType: "manufacturingOrder" = "manufacturingOrder";
 
     @ValidateNested()
     @Type(() => ManufacturingOrderDataDto)

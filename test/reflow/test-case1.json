@@ -1,0 +1,33 @@
+{
+    "documents": [
+        {
+            "docId": "wc-1",
+            "docType": "workCenter",
+            "data": {
+                "name": "Assembly A",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 8,
+                        "endHour": 16
+                    }
+                ],
+                "maintenanceWindows": []
+            }
+        },
+        {
+            "docId": "wo-1",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-001",
+                "manufacturingOrderId": "MO-1",
+                "workCenterId": "Assembly A",
+                "startDate": "2025-02-10T08:00:00Z",
+                "endDate": "2025-02-10T12:00:00Z",
+                "durationMinutes": 240,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": []
+            }
+        }
+    ]
+}
