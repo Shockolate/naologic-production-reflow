@@ -18,19 +18,25 @@ export class ReflowService {
     constructor(private readonly workflowBuilderService: WorkflowBuilderService) { }
 
     reflow(input: ReflowServiceInput): ReflowResult {
+        // Track the assignments of work orders to work centers.
         const assignments = new Map<string, { workCenterName: string, workOrder: WorkOrderData }>();
 
+        // Populate the work centers map for easy retrieval
         const workCenters = ReflowService.populateWorkCenters(input.workCenters);
 
         const sortedMaintenanceWorkOrders = input.workOrders.map((document) => (document.data)).filter(wo => wo.isMaintenance).sort((a, b) => DateTime.fromISO(a.startDate).diff(DateTime.fromISO(b.startDate)).toMillis());
         const sortedOtherWorkOrders = input.workOrders.map((document) => (document.data)).filter(wo => !wo.isMaintenance).sort((a, b) => DateTime.fromISO(a.startDate).diff(DateTime.fromISO(b.startDate)).toMillis());
 
+        // Process work orders into a DAG and sort them in topological order. Process maintenance work orders first, then other work orders.
         const workflowGraph = this.workflowBuilderService.buildWorkflow(sortedMaintenanceWorkOrders.concat(sortedOtherWorkOrders));
         const sortedWorkOrderNumbers = this.workflowBuilderService.getSortedWorkOrderNumbers(workflowGraph);
+
+        // Track the booked slots by work center.
         const bookedSlotsByCenter = new Map<string, Interval[]>();
+        // Track the completion times of completed work orders.
         const completionTimesOfCompletedWorkOrders = new Map<string, DateTime>();
 
-
+        // Track the changes to the work orders.
         const changes: ReflowChange[] = [];
 
         // Process work orders in topological order
@@ -47,10 +53,13 @@ export class ReflowService {
                         endDate: workOrder.endDate,
                     }
                 });
+
+                // Insert the booked slot into the booked slots map for the work center.
                 bookedSlotsByCenter.set(workOrder.workCenterId, [...(bookedSlotsByCenter.get(workOrder.workCenterId) || []), Interval.fromDateTimes(DateTime.fromISO(workOrder.startDate), DateTime.fromISO(workOrder.endDate))]);
                 continue;
             }
 
+            // Get the work center for the work order.
             const workCenter = workCenters.get(workOrder.workCenterId);
             if (!workCenter) {
                 throw new Error(`Work center ${workOrder.workCenterId} not found`);
@@ -59,7 +68,8 @@ export class ReflowService {
 
             let earliestStart = DateTime.fromISO(workOrder.startDate);
 
-            // Calculate earliest start from dependencies
+            // Calculate earliest start by first checking the completion times of the parent work orders.
+            // We know that the parent work orders have been processed first because we sorted the work orders in topological order.
             let parentChange: ReflowChange | undefined;
             for (const parentId of workOrder.dependsOnWorkOrderIds) {
                 if (parentId in completionTimesOfCompletedWorkOrders) {

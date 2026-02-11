@@ -1,0 +1,431 @@
+{
+    "documents": [
+        {
+            "docId": "wc-extrusion-1",
+            "docType": "workCenter",
+            "data": {
+                "name": "Extrusion Line 1",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 6,
+                        "endHour": 14
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 6,
+                        "endHour": 14
+                    },
+                    {
+                        "dayOfWeek": 3,
+                        "startHour": 6,
+                        "endHour": 14
+                    },
+                    {
+                        "dayOfWeek": 4,
+                        "startHour": 6,
+                        "endHour": 14
+                    },
+                    {
+                        "dayOfWeek": 5,
+                        "startHour": 6,
+                        "endHour": 14
+                    }
+                ],
+                "maintenanceWindows": [
+                    {
+                        "startDate": "2025-02-12T10:00:00Z",
+                        "endDate": "2025-02-12T13:00:00Z",
+                        "reason": "Scheduled die replacement and calibration"
+                    }
+                ]
+            }
+        },
+        {
+            "docId": "wc-extrusion-2",
+            "docType": "workCenter",
+            "data": {
+                "name": "Extrusion Line 2",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 14,
+                        "endHour": 22
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 14,
+                        "endHour": 22
+                    },
+                    {
+                        "dayOfWeek": 3,
+                        "startHour": 14,
+                        "endHour": 22
+                    },
+                    {
+                        "dayOfWeek": 4,
+                        "startHour": 14,
+                        "endHour": 22
+                    },
+                    {
+                        "dayOfWeek": 5,
+                        "startHour": 14,
+                        "endHour": 22
+                    }
+                ],
+                "maintenanceWindows": []
+            }
+        },
+        {
+            "docId": "wc-quality-check",
+            "docType": "workCenter",
+            "data": {
+                "name": "Quality Control Station",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 3,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 4,
+                        "startHour": 8,
+                        "endHour": 17
+                    },
+                    {
+                        "dayOfWeek": 5,
+                        "startHour": 8,
+                        "endHour": 17
+                    }
+                ],
+                "maintenanceWindows": []
+            }
+        },
+        {
+            "docId": "wc-packaging",
+            "docType": "workCenter",
+            "data": {
+                "name": "Packaging Line",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 7,
+                        "endHour": 15
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 7,
+                        "endHour": 15
+                    },
+                    {
+                        "dayOfWeek": 3,
+                        "startHour": 7,
+                        "endHour": 15
+                    },
+                    {
+                        "dayOfWeek": 4,
+                        "startHour": 7,
+                        "endHour": 15
+                    },
+                    {
+                        "dayOfWeek": 5,
+                        "startHour": 7,
+                        "endHour": 15
+                    }
+                ],
+                "maintenanceWindows": [
+                    {
+                        "startDate": "2025-02-13T07:00:00Z",
+                        "endDate": "2025-02-13T09:00:00Z",
+                        "reason": "Preventive maintenance on sealing equipment"
+                    }
+                ]
+            }
+        },
+        {
+            "docId": "wc-assembly",
+            "docType": "workCenter",
+            "data": {
+                "name": "Assembly Station",
+                "shifts": [
+                    {
+                        "dayOfWeek": 1,
+                        "startHour": 6,
+                        "endHour": 18
+                    },
+                    {
+                        "dayOfWeek": 2,
+                        "startHour": 6,
+                        "endHour": 18
+                    },
+                    {
+                        "dayOfWeek": 3,
+                        "startHour": 6,
+                        "endHour": 18
+                    },
+                    {
+                        "dayOfWeek": 4,
+                        "startHour": 6,
+                        "endHour": 18
+                    },
+                    {
+                        "dayOfWeek": 5,
+                        "startHour": 6,
+                        "endHour": 18
+                    }
+                ],
+                "maintenanceWindows": []
+            }
+        },
+        {
+            "docId": "mo-urgent-order",
+            "docType": "manufacturingOrder",
+            "data": {
+                "manufacturingOrderNumber": "MO-2025-001",
+                "itemId": "PIPE-100MM-PVC",
+                "quantity": 500,
+                "dueDate": "2025-02-14T17:00:00Z"
+            }
+        },
+        {
+            "docId": "mo-standard-order",
+            "docType": "manufacturingOrder",
+            "data": {
+                "manufacturingOrderNumber": "MO-2025-002",
+                "itemId": "PIPE-50MM-PVC",
+                "quantity": 1000,
+                "dueDate": "2025-02-15T17:00:00Z"
+            }
+        },
+        {
+            "docId": "mo-large-order",
+            "docType": "manufacturingOrder",
+            "data": {
+                "manufacturingOrderNumber": "MO-2025-003",
+                "itemId": "PIPE-75MM-HDPE",
+                "quantity": 750,
+                "dueDate": "2025-02-16T17:00:00Z"
+            }
+        },
+        {
+            "docId": "wo-maint-001",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-MAINT-001",
+                "manufacturingOrderId": "MAINTENANCE",
+                "workCenterId": "Extrusion Line 1",
+                "startDate": "2025-02-12T10:00:00Z",
+                "endDate": "2025-02-12T13:00:00Z",
+                "durationMinutes": 180,
+                "isMaintenance": true,
+                "dependsOnWorkOrderIds": []
+            }
+        },
+        {
+            "docId": "wo-001",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-001",
+                "manufacturingOrderId": "MO-2025-001",
+                "workCenterId": "Extrusion Line 1",
+                "startDate": "2025-02-10T06:00:00Z",
+                "endDate": "2025-02-10T11:30:00Z",
+                "durationMinutes": 330,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": []
+            }
+        },
+        {
+            "docId": "wo-002",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-002",
+                "manufacturingOrderId": "MO-2025-001",
+                "workCenterId": "Quality Control Station",
+                "startDate": "2025-02-10T11:30:00Z",
+                "endDate": "2025-02-10T13:00:00Z",
+                "durationMinutes": 90,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-001"]
+            }
+        },
+        {
+            "docId": "wo-003",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-003",
+                "manufacturingOrderId": "MO-2025-001",
+                "workCenterId": "Packaging Line",
+                "startDate": "2025-02-10T13:00:00Z",
+                "endDate": "2025-02-10T14:30:00Z",
+                "durationMinutes": 90,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-002"]
+            }
+        },
+        {
+            "docId": "wo-004",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-004",
+                "manufacturingOrderId": "MO-2025-002",
+                "workCenterId": "Extrusion Line 1",
+                "startDate": "2025-02-11T06:00:00Z",
+                "endDate": "2025-02-11T13:00:00Z",
+                "durationMinutes": 420,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": []
+            }
+        },
+        {
+            "docId": "wo-005",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-005",
+                "manufacturingOrderId": "MO-2025-002",
+                "workCenterId": "Quality Control Station",
+                "startDate": "2025-02-11T13:00:00Z",
+                "endDate": "2025-02-11T15:00:00Z",
+                "durationMinutes": 120,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-004"]
+            }
+        },
+        {
+            "docId": "wo-006",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-006",
+                "manufacturingOrderId": "MO-2025-003",
+                "workCenterId": "Extrusion Line 2",
+                "startDate": "2025-02-10T14:00:00Z",
+                "endDate": "2025-02-10T20:00:00Z",
+                "durationMinutes": 360,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": []
+            }
+        },
+        {
+            "docId": "wo-007",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-007",
+                "manufacturingOrderId": "MO-2025-003",
+                "workCenterId": "Quality Control Station",
+                "startDate": "2025-02-11T08:00:00Z",
+                "endDate": "2025-02-11T10:30:00Z",
+                "durationMinutes": 150,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-006"]
+            }
+        },
+        {
+            "docId": "wo-008",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-008",
+                "manufacturingOrderId": "MO-2025-003",
+                "workCenterId": "Assembly Station",
+                "startDate": "2025-02-11T10:30:00Z",
+                "endDate": "2025-02-11T14:30:00Z",
+                "durationMinutes": 240,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-007"]
+            }
+        },
+        {
+            "docId": "wo-009",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-009",
+                "manufacturingOrderId": "MO-2025-003",
+                "workCenterId": "Packaging Line",
+                "startDate": "2025-02-11T14:30:00Z",
+                "endDate": "2025-02-12T07:30:00Z",
+                "durationMinutes": 180,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-008"]
+            }
+        },
+        {
+            "docId": "wo-010",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-010",
+                "manufacturingOrderId": "MO-2025-002",
+                "workCenterId": "Extrusion Line 1",
+                "startDate": "2025-02-12T06:00:00Z",
+                "endDate": "2025-02-12T09:30:00Z",
+                "durationMinutes": 210,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": []
+            }
+        },
+        {
+            "docId": "wo-011",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-011",
+                "manufacturingOrderId": "MO-2025-001",
+                "workCenterId": "Assembly Station",
+                "startDate": "2025-02-12T08:00:00Z",
+                "endDate": "2025-02-12T13:00:00Z",
+                "durationMinutes": 300,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-003", "WO-010"]
+            }
+        },
+        {
+            "docId": "wo-012",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-012",
+                "manufacturingOrderId": "MO-2025-002",
+                "workCenterId": "Packaging Line",
+                "startDate": "2025-02-12T13:00:00Z",
+                "endDate": "2025-02-13T08:00:00Z",
+                "durationMinutes": 240,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-005", "WO-011"]
+            }
+        },
+        {
+            "docId": "wo-013",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-013",
+                "manufacturingOrderId": "MO-2025-003",
+                "workCenterId": "Quality Control Station",
+                "startDate": "2025-02-13T08:00:00Z",
+                "endDate": "2025-02-13T10:00:00Z",
+                "durationMinutes": 120,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-009"]
+            }
+        },
+        {
+            "docId": "wo-014",
+            "docType": "workOrder",
+            "data": {
+                "workOrderNumber": "WO-014",
+                "manufacturingOrderId": "MO-2025-001",
+                "workCenterId": "Quality Control Station",
+                "startDate": "2025-02-13T10:00:00Z",
+                "endDate": "2025-02-13T11:30:00Z",
+                "durationMinutes": 90,
+                "isMaintenance": false,
+                "dependsOnWorkOrderIds": ["WO-011", "WO-012"]
+            }
+        }
+    ]
+}
