@@ -4,6 +4,15 @@ import { WorkflowBuilderService } from "./workflow-builder.service";
 import { DateTime, Interval } from "luxon";
 import { DateTimeUtil } from "./DateTimeUtil";
 
+
+export type ReflowChange = {
+    workOrderNumber: string;
+    changeType: "startDate" | "endDate";
+    oldValue: string;
+    newValue: string;
+    reason: string;
+}
+
 @Injectable()
 export class ReflowService {
     constructor(private readonly workflowBuilderService: WorkflowBuilderService) { }
@@ -13,15 +22,16 @@ export class ReflowService {
 
         const workCenters = ReflowService.populateWorkCenters(input.workCenters);
 
-        const workflowGraph = this.workflowBuilderService.buildWorkflow(
-            input.workOrders
-                .map(wo => wo.data)
-                .sort((a, b) => 
-                    DateTime.fromISO(a.startDate).diff(DateTime.fromISO(b.startDate)).toMillis()
-            ));
+        const sortedMaintenanceWorkOrders = input.workOrders.map((document) => (document.data)).filter(wo => wo.isMaintenance).sort((a, b) => DateTime.fromISO(a.startDate).diff(DateTime.fromISO(b.startDate)).toMillis());
+        const sortedOtherWorkOrders = input.workOrders.map((document) => (document.data)).filter(wo => !wo.isMaintenance).sort((a, b) => DateTime.fromISO(a.startDate).diff(DateTime.fromISO(b.startDate)).toMillis());
+
+        const workflowGraph = this.workflowBuilderService.buildWorkflow(sortedMaintenanceWorkOrders.concat(sortedOtherWorkOrders));
         const sortedWorkOrderNumbers = this.workflowBuilderService.getSortedWorkOrderNumbers(workflowGraph);
         const bookedSlotsByCenter = new Map<string, Interval[]>();
         const completionTimesOfCompletedWorkOrders = new Map<string, DateTime>();
+
+
+        const changes: ReflowChange[] = [];
 
         // Process work orders in topological order
         for (const workOrderNumber of sortedWorkOrderNumbers) {
@@ -37,6 +47,7 @@ export class ReflowService {
                         endDate: workOrder.endDate,
                     }
                 });
+                bookedSlotsByCenter.set(workOrder.workCenterId, [...(bookedSlotsByCenter.get(workOrder.workCenterId) || []), Interval.fromDateTimes(DateTime.fromISO(workOrder.startDate), DateTime.fromISO(workOrder.endDate))]);
                 continue;
             }
 
@@ -49,19 +60,60 @@ export class ReflowService {
             let earliestStart = DateTime.fromISO(workOrder.startDate);
 
             // Calculate earliest start from dependencies
+            let parentChange: ReflowChange | undefined;
             for (const parentId of workOrder.dependsOnWorkOrderIds) {
                 if (parentId in completionTimesOfCompletedWorkOrders) {
                     earliestStart = DateTime.max(earliestStart, completionTimesOfCompletedWorkOrders.get(parentId)!);
+                    if (!earliestStart.equals(DateTime.fromISO(workOrder.startDate))) {
+                        parentChange = {
+                            workOrderNumber: workOrderNumber,
+                            changeType: "startDate",
+                            oldValue: workOrder.startDate,
+                            newValue: earliestStart.toISO()!,
+                            reason: `Parent Work Order ${parentId} completed at ${earliestStart.toISO()}`,
+                        };
+                    }
                 }
             }
 
+            if (parentChange) {
+                changes.push(parentChange);
+            }
+
+            let shiftOrMaintenanceChange: ReflowChange | undefined;
             // Clamp to start of next available window if earliestStart is not in shift
             if (!ReflowService.isAvailable(workCenter, earliestStart)) {
+                const oldEarliestStart = earliestStart;
                 earliestStart = ReflowService.nextAvailableMoment(workCenter, earliestStart);
+
+                // Updating the time start change if the earliest start has changed
+                if (!earliestStart.equals(DateTime.fromISO(parentChange ? parentChange.newValue : workOrder.startDate))) {
+                    shiftOrMaintenanceChange = {
+                        workOrderNumber: workOrderNumber,
+                        changeType: "startDate",
+                        oldValue: parentChange ? parentChange.newValue : workOrder.startDate,
+                        newValue: earliestStart.toISO()!,
+                        reason: `WorkCenter ${workCenter.name} does not have a shift or is in a maintenance window at ${oldEarliestStart.toISO()}`,
+                    };
+                }
+            }
+
+            if (shiftOrMaintenanceChange) {
+                changes.push(shiftOrMaintenanceChange);
             }
 
             // get the booked slot
             const interval = ReflowService.firstFreeSlot(workCenter, bookedSlotsByCenter.get(workCenter.name) || [], earliestStart, duration);
+
+            if (interval.start!.diff(earliestStart).toMillis() > 0) {
+                changes.push({
+                    workOrderNumber: workOrderNumber,
+                    changeType: "startDate",
+                    oldValue: earliestStart.toISO() || "",
+                    newValue: interval.start!.toISO() || "",
+                    reason: `WorkCenter ${workCenter.name} is processing other WorkOrders at ${earliestStart.toISO()}`,
+                });
+            }
 
             // record the booked slot
             assignments.set(workOrderNumber, {
@@ -77,12 +129,10 @@ export class ReflowService {
             bookedSlotsByCenter.set(workCenter.name, [...(bookedSlotsByCenter.get(workCenter.name) || []), interval]);
         }
 
-        console.log(assignments);
-
         return {
             updatedWorkOrders: Array.from(assignments.values()).map(({ workOrder }) => workOrder),
-            changes: [],
-            explanation: [],
+            changes: ReflowService.generateWhatChanged(changes),
+            explanation: ReflowService.generateExplanation(changes),
         }
     }
 
@@ -191,5 +241,13 @@ export class ReflowService {
             workOrdersByCenter.set(workOrder.data.workCenterId, [...(workOrdersByCenter.get(workOrder.data.workCenterId) || []), workOrder.data]);
         }
         return workOrdersByCenter;
+    }
+
+    static generateWhatChanged(changes: ReflowChange[]): string[] {
+        return changes.map(change => `${change.workOrderNumber} changed the ${change.changeType} from ${change.oldValue} to ${change.newValue}`);
+    }
+
+    static generateExplanation(changes: ReflowChange[]): string[] {
+        return changes.map(change => `${change.workOrderNumber} changed the ${change.changeType} from ${change.oldValue} to ${change.newValue} because ${change.reason}`);
     }
 }
