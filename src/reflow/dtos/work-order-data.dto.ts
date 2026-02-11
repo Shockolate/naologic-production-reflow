@@ -1,29 +1,29 @@
-import { IsArray, IsBoolean, IsNumber, IsString, Min } from "class-validator";
+import { IsArray, IsBoolean, IsNumber, IsString, Min } from 'class-validator';
 
 export class WorkOrderDataDto {
-    @IsString()
-    workOrderNumber!: string;
+  @IsString()
+  workOrderNumber!: string;
 
-    @IsString()
-    manufacturingOrderId!: string;
+  @IsString()
+  manufacturingOrderId!: string;
 
-    @IsString()
-    workCenterId!: string;
+  @IsString()
+  workCenterId!: string;
 
-    @IsString()
-    startDate!: string;
+  @IsString()
+  startDate!: string;
 
-    @IsString()
-    endDate!: string;
+  @IsString()
+  endDate!: string;
 
-    @IsNumber()
-    @Min(0)
-    durationMinutes!: number;
+  @IsNumber()
+  @Min(0)
+  durationMinutes!: number;
 
-    @IsBoolean()
-    isMaintenance!: boolean;
+  @IsBoolean()
+  isMaintenance!: boolean;
 
-    @IsArray()
-    @IsString({ each: true })
-    dependsOnWorkOrderIds!: string[];
+  @IsArray()
+  @IsString({ each: true })
+  dependsOnWorkOrderIds!: string[];
 }

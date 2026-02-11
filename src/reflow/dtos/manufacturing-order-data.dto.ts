@@ -1,16 +1,16 @@
-import { IsNumber, IsString, Min } from "class-validator";
+import { IsNumber, IsString, Min } from 'class-validator';
 
 export class ManufacturingOrderDataDto {
-    @IsString()
-    manufacturingOrderNumber!: string;
+  @IsString()
+  manufacturingOrderNumber!: string;
 
-    @IsString()
-    itemId!: string;
+  @IsString()
+  itemId!: string;
 
-    @IsNumber()
-    @Min(0)
-    quantity!: number;
+  @IsNumber()
+  @Min(0)
+  quantity!: number;
 
-    @IsString()
-    dueDate!: string;
+  @IsString()
+  dueDate!: string;
 }
