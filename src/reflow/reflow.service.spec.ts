@@ -20,27 +20,27 @@ describe(ReflowService.name, () => {
         expect(service).toBeDefined();
     });
 
-    describe("IsInShift", () => {
+    describe("isInShift", () => {
         it("should return true if the date time is in the shift", () => {
             const wc = workCenter("WC-001", [{ dayOfWeek: 1, startHour: 8, endHour: 17 }]);
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10 });
-            expect(ReflowService.IsInShift(wc, dateTime)).toBe(true);
+            expect(ReflowService.isInShift(wc, dateTime)).toBe(true);
         });
 
         it("should return false if the date time is outside of the shift by weekday", () => {
             const wc = workCenter("WC-001", [{ dayOfWeek: 1, startHour: 8, endHour: 17 }]);
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 6, hour: 10 });
-            expect(ReflowService.IsInShift(wc, dateTime)).toBe(false);
+            expect(ReflowService.isInShift(wc, dateTime)).toBe(false);
         });
 
         it("should return false if the date time is outside of the shift by hour", () => {
             const wc = workCenter("WC-001", [{ dayOfWeek: 1, startHour: 8, endHour: 17 }]);
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 18 });
-            expect(ReflowService.IsInShift(wc, dateTime)).toBe(false);
+            expect(ReflowService.isInShift(wc, dateTime)).toBe(false);
         });
     });
 
-    describe("IsInMaintenanceWindow", () => {
+    describe("isInMaintenanceWindow", () => {
         it("should return true if the date time is within a maintenance window", () => {
             const wc = workCenter(
                 "WC-001",
@@ -51,7 +51,7 @@ describe(ReflowService.name, () => {
                 }]
             );
             const dateTime = DateTime.fromISO("2026-01-05T10:00:00Z");
-            expect(ReflowService.IsInMaintenanceWindow(wc, dateTime)).toBe(true);
+            expect(ReflowService.isInMaintenanceWindow(wc, dateTime)).toBe(true);
         });
 
         it("should return false if the date time is before the maintenance window", () => {
@@ -64,7 +64,7 @@ describe(ReflowService.name, () => {
                 }]
             );
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 8, minute: 59, second: 59 });
-            expect(ReflowService.IsInMaintenanceWindow(wc, dateTime)).toBe(false);
+            expect(ReflowService.isInMaintenanceWindow(wc, dateTime)).toBe(false);
         });
 
         it("should return false if the date time is after the maintenance window", () => {
@@ -77,7 +77,7 @@ describe(ReflowService.name, () => {
                 }]
             );
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 11, minute: 0, second: 1 });
-            expect(ReflowService.IsInMaintenanceWindow(wc, dateTime)).toBe(false);
+            expect(ReflowService.isInMaintenanceWindow(wc, dateTime)).toBe(false);
         });
 
         it("should return false if there are no maintenance windows", () => {
@@ -87,7 +87,7 @@ describe(ReflowService.name, () => {
                 []
             );
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 });
-            expect(ReflowService.IsInMaintenanceWindow(wc, dateTime)).toBe(false);
+            expect(ReflowService.isInMaintenanceWindow(wc, dateTime)).toBe(false);
         });
 
         it("should return true if the date time is on the edge (startDate)", () => {
@@ -100,7 +100,7 @@ describe(ReflowService.name, () => {
                 }]
             );
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 9, minute: 0, second: 0 });
-            expect(ReflowService.IsInMaintenanceWindow(wc, dateTime)).toBe(true);
+            expect(ReflowService.isInMaintenanceWindow(wc, dateTime)).toBe(true);
         });
 
         it("should return false if the date time is on the edge (endDate)", () => {
@@ -113,7 +113,7 @@ describe(ReflowService.name, () => {
                 }]
             );
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 11, minute: 0, second: 0 });
-            expect(ReflowService.IsInMaintenanceWindow(wc, dateTime)).toBe(false);
+            expect(ReflowService.isInMaintenanceWindow(wc, dateTime)).toBe(false);
         });
 
         it("should return true for any window if multiple maintenance windows exist and date is in one", () => {
@@ -132,7 +132,7 @@ describe(ReflowService.name, () => {
                 ]
             );
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 });
-            expect(ReflowService.IsInMaintenanceWindow(wc, dateTime)).toBe(true);
+            expect(ReflowService.isInMaintenanceWindow(wc, dateTime)).toBe(true);
         });
 
         it("should return false if date is outside all maintenance windows", () => {
@@ -151,7 +151,7 @@ describe(ReflowService.name, () => {
                 ]
             );
             const dateTime = DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 12, minute: 0, second: 0 });
-            expect(ReflowService.IsInMaintenanceWindow(wc, dateTime)).toBe(false);
+            expect(ReflowService.isInMaintenanceWindow(wc, dateTime)).toBe(false);
         });
     });
 
@@ -454,14 +454,14 @@ describe(ReflowService.name, () => {
             expect(result).toHaveProperty("updatedWorkOrders");
             expect(result.updatedWorkOrders).toHaveLength(2);
             expect(result.updatedWorkOrders[0].workOrderNumber).toBe("WO-1");
-            expect(result.updatedWorkOrders[0].startDate).toBe(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 8, minute: 0, second: 0 }).toISO() || "");
-            expect(result.updatedWorkOrders[0].endDate).toBe(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 }).toISO() || "");
+            expect(DateTime.fromISO(result.updatedWorkOrders[0].startDate).equals(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 8, minute: 0, second: 0 }))).toBe(true);
+            expect(DateTime.fromISO(result.updatedWorkOrders[0].endDate).equals(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 }))).toBe(true);
             expect(result.updatedWorkOrders[1].workOrderNumber).toBe("WO-2");
-            expect(result.updatedWorkOrders[1].startDate).toBe(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 }).toISO() || "");
-            expect(result.updatedWorkOrders[1].endDate).toBe(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 12, minute: 0, second: 0 }).toISO() || "");
+            expect(DateTime.fromISO(result.updatedWorkOrders[1].startDate).equals(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 }))).toBe(true);
+            expect(DateTime.fromISO(result.updatedWorkOrders[1].endDate).equals(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 12, minute: 0, second: 0 }))).toBe(true);
         });
 
-        it("should handle overlapping work orders on the same work center - in the opposite order", () => {
+        it("should handle overlapping work orders on the same work center (in the opposite order)", () => {
             // Both work orders target the same work center and have overlapping time windows.
             const workOrders = [
                 workOrderDocument(
@@ -502,11 +502,11 @@ describe(ReflowService.name, () => {
             expect(result).toHaveProperty("updatedWorkOrders");
             expect(result.updatedWorkOrders).toHaveLength(2);
             expect(result.updatedWorkOrders[0].workOrderNumber).toBe("WO-2");
-            expect(result.updatedWorkOrders[0].startDate).toBe(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 8, minute: 0, second: 0 }).toISO() || "");
-            expect(result.updatedWorkOrders[0].endDate).toBe(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 }).toISO() || "");
+            expect(DateTime.fromISO(result.updatedWorkOrders[0].startDate).equals(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 8, minute: 0, second: 0 }))).toBe(true);
+            expect(DateTime.fromISO(result.updatedWorkOrders[0].endDate).equals(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 }))).toBe(true);
             expect(result.updatedWorkOrders[1].workOrderNumber).toBe("WO-1");
-            expect(result.updatedWorkOrders[1].startDate).toBe(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 }).toISO() || "");
-            expect(result.updatedWorkOrders[1].endDate).toBe(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 12, minute: 0, second: 0 }).toISO() || "");
+            expect(DateTime.fromISO(result.updatedWorkOrders[1].startDate).equals(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 10, minute: 0, second: 0 }))).toBe(true);
+            expect(DateTime.fromISO(result.updatedWorkOrders[1].endDate).equals(DateTime.fromObject({ year: 2026, month: 1, day: 5, hour: 12, minute: 0, second: 0 }))).toBe(true);
         });
 
         it("should respect maintenance windows on work centers when reflowing work orders", () => {
@@ -557,13 +557,13 @@ describe(ReflowService.name, () => {
 
             // First WO should be at 8:00-9:00 as it fits before maintenance window
             const wo1 = result.updatedWorkOrders.find(wo => wo.workOrderNumber === "WO-1")!;
-            expect(wo1.startDate).toBe(DateTime.fromObject({ year: 2030, month: 6, day: 3, hour: 8 }).toISO() || "");
-            expect(wo1.endDate).toBe(DateTime.fromObject({ year: 2030, month: 6, day: 3, hour: 9 }).toISO() || "");
+            expect(DateTime.fromISO(wo1.startDate).equals(DateTime.fromObject({ year: 2030, month: 6, day: 3, hour: 8 }))).toBe(true);
+            expect(DateTime.fromISO(wo1.endDate).equals(DateTime.fromObject({ year: 2030, month: 6, day: 3, hour: 9 }))).toBe(true);
 
             // Second WO must be placed after maintenance, i.e., starts at 10:00
             const wo2 = result.updatedWorkOrders.find(wo => wo.workOrderNumber === "WO-2")!;
-            expect(wo2.startDate).toBe(DateTime.fromObject({ year: 2030, month: 6, day: 3, hour: 10 }).toISO() || "");
-            expect(wo2.endDate).toBe(DateTime.fromObject({ year: 2030, month: 6, day: 3, hour: 11 }).toISO() || "");
+            expect(DateTime.fromISO(wo2.startDate).equals(DateTime.fromObject({ year: 2030, month: 6, day: 3, hour: 10 }))).toBe(true);
+            expect(DateTime.fromISO(wo2.endDate).equals(DateTime.fromObject({ year: 2030, month: 6, day: 3, hour: 11 }))).toBe(true);
         });
 
         it("should not move maintenance work orders, and others are scheduled around them", () => {
@@ -618,19 +618,19 @@ describe(ReflowService.name, () => {
 
             // Maintenance WO should retain its time
             const maint = result.updatedWorkOrders.find(wo => wo.workOrderNumber === "WO-MAINTENANCE")!;
-            expect(maint.startDate).toBe(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 10 }).toISO() || "");
-            expect(maint.endDate).toBe(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 11 }).toISO() || "");
+            expect(DateTime.fromISO(maint.startDate).equals(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 10 }))).toBe(true);
+            expect(DateTime.fromISO(maint.endDate).equals(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 11 }))).toBe(true);
             expect(maint.isMaintenance).toBe(true);
 
             // WO-A scheduled before maintenance
             const woa = result.updatedWorkOrders.find(wo => wo.workOrderNumber === "WO-A")!;
-            expect(woa.startDate).toBe(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 9 }).toISO() || "");
-            expect(woa.endDate).toBe(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 10 }).toISO() || "");
+            expect(DateTime.fromISO(woa.startDate).equals(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 9 }))).toBe(true);
+            expect(DateTime.fromISO(woa.endDate).equals(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 10 }))).toBe(true);
 
             // WO-B scheduled after maintenance
             const wob = result.updatedWorkOrders.find(wo => wo.workOrderNumber === "WO-B")!;
-            expect(wob.startDate).toBe(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 11 }).toISO() || "");
-            expect(wob.endDate).toBe(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 12 }).toISO() || "");
+            expect(DateTime.fromISO(wob.startDate).equals(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 11 }))).toBe(true);
+            expect(DateTime.fromISO(wob.endDate).equals(DateTime.fromObject({ year: 2031, month: 4, day: 14, hour: 12 }))).toBe(true);
         });
     });
 });

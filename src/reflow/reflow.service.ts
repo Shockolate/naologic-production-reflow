@@ -56,7 +56,7 @@ export class ReflowService {
             }
 
             // Clamp to start of next available window if earliestStart is not in shift
-            if (!ReflowService.IsAvailable(workCenter, earliestStart)) {
+            if (!ReflowService.isAvailable(workCenter, earliestStart)) {
                 earliestStart = ReflowService.nextAvailableMoment(workCenter, earliestStart);
             }
 
@@ -67,8 +67,8 @@ export class ReflowService {
             assignments.set(workOrderNumber, {
                 workCenterName: workCenter.name, workOrder: {
                     ...workOrder,
-                    startDate: interval.start!.toISO(),
-                    endDate: interval.end!.toISO(),
+                    startDate: interval.start!.setZone('UTC').toISO()!,
+                    endDate: interval.end!.setZone('UTC').toISO()!,
                 }
             });
             completionTimesOfCompletedWorkOrders.set(workOrderNumber, interval.end!);
@@ -87,7 +87,7 @@ export class ReflowService {
     }
 
     /** Check if the date time is in a shift */
-    static IsInShift(workCenter: WorkCenterData, dateTime: DateTime): boolean {
+    static isInShift(workCenter: WorkCenterData, dateTime: DateTime): boolean {
         for (const shift of workCenter.shifts) {
             if (shift.dayOfWeek === DateTimeUtil.FromDateTimeWeekday(dateTime)) {
                 if (shift.startHour <= dateTime.hour && shift.endHour > dateTime.hour) {
@@ -99,7 +99,7 @@ export class ReflowService {
     }
 
     /** Check if the date time is in a maintenance window */
-    static IsInMaintenanceWindow(workCenter: WorkCenterData, dateTime: DateTime): boolean {
+    static isInMaintenanceWindow(workCenter: WorkCenterData, dateTime: DateTime): boolean {
         for (const maintenanceWindow of workCenter.maintenanceWindows) {
             if (dateTime >= DateTime.fromISO(maintenanceWindow.startDate) && dateTime < DateTime.fromISO(maintenanceWindow.endDate)) {
                 return true;
@@ -109,14 +109,14 @@ export class ReflowService {
     }
 
     /** Check if the work center is available at the given date time */
-    static IsAvailable(workCenter: WorkCenterData, dateTime: DateTime): boolean {
-        return ReflowService.IsInShift(workCenter, dateTime) && !ReflowService.IsInMaintenanceWindow(workCenter, dateTime);
+    static isAvailable(workCenter: WorkCenterData, dateTime: DateTime): boolean {
+        return ReflowService.isInShift(workCenter, dateTime) && !ReflowService.isInMaintenanceWindow(workCenter, dateTime);
     }
 
     /** Find the next time where the work center is available */
     static nextAvailableMoment(workCenter: WorkCenterData, dateTime: DateTime): DateTime {
         let candidateDateTime = dateTime;
-        while (!ReflowService.IsAvailable(workCenter, candidateDateTime)) {
+        while (!ReflowService.isAvailable(workCenter, candidateDateTime)) {
             candidateDateTime = candidateDateTime.plus({ minutes: 1 });
         }
         return candidateDateTime;
@@ -127,7 +127,7 @@ export class ReflowService {
         let remainingMinutes = durationMinutes;
         let currentTime = timeStart;
         while (remainingMinutes > 0) {
-            if (!ReflowService.IsAvailable(workCenter, currentTime)) {
+            if (!ReflowService.isAvailable(workCenter, currentTime)) {
                 currentTime = ReflowService.nextAvailableMoment(workCenter, currentTime);
                 continue;
             }
